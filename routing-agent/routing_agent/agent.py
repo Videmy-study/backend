@@ -17,6 +17,7 @@
 import sys
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 from google.adk.agents import LlmAgent
 from google.adk.tools.agent_tool import AgentTool
@@ -24,6 +25,37 @@ from google.adk.tools.agent_tool import AgentTool
 from . import prompt
 
 MODEL = "gemini-2.5-pro"
+
+# Load environment variables from multiple locations
+def load_environment_variables():
+    """Load environment variables from routing agent and political news directories."""
+    current_dir = Path(__file__).parent
+    backend_dir = current_dir.parent.parent
+    
+    # Load from routing agent directory
+    routing_env_file = backend_dir / "routing-agent" / ".env"
+    if routing_env_file.exists():
+        load_dotenv(routing_env_file)
+        print(f"✅ Loaded environment variables from {routing_env_file}")
+    
+    # Load from political news directory
+    political_env_file = backend_dir / "political-news" / ".env"
+    if political_env_file.exists():
+        load_dotenv(political_env_file)
+        print(f"✅ Loaded environment variables from {political_env_file}")
+    
+    # Check for required political news API keys
+    political_keys = ["NEWSAPI_KEY", "GNEWS_API_KEY", "MEDIASTACK_API_KEY", "NEWSDATA_API_KEY"]
+    available_keys = [key for key in political_keys if os.getenv(key)]
+    
+    if available_keys:
+        print(f"✅ Found {len(available_keys)} political news API keys: {', '.join(available_keys)}")
+    else:
+        print("⚠️  No political news API keys found. Political news agent may not work properly.")
+        print("   Please set at least one of: NEWSAPI_KEY, GNEWS_API_KEY, MEDIASTACK_API_KEY, NEWSDATA_API_KEY")
+
+# Load environment variables
+load_environment_variables()
 
 # Add parent directories to path to import the specialized agents
 current_dir = Path(__file__).parent
