@@ -1,6 +1,6 @@
 # Routing Agent
 
-A smart routing agent that analyzes user requests and directs them to the appropriate specialized agent - either the Academic Research Agent or the FOMC Research Agent.
+A smart routing agent that analyzes user requests and directs them to the appropriate specialized agent - Academic Research Agent, FOMC Research Agent, or Political News Agent.
 
 ## Overview
 
@@ -30,6 +30,10 @@ The Routing Agent serves as an intelligent dispatcher that:
 ### FOMC Research Agent
 - **Purpose**: Federal Open Market Committee meetings and financial market analysis
 - **Keywords**: Fed, FOMC, Federal Reserve, interest rates, monetary policy, financial markets, economic policy, banking, market analysis, rate decisions, economic indicators, financial services
+
+### Political News Agent
+- **Purpose**: Scrapes and analyzes unbiased political news from multiple sources
+- **Keywords**: political news, current events, government, elections, policy, politics, political analysis, news, current affairs, political developments, government decisions, political campaigns, legislative, voting, political opinion
 
 ## Setup and Installation
 
@@ -69,13 +73,14 @@ The Routing Agent serves as an intelligent dispatcher that:
 
 ### Agent Integration
 
-To integrate with the existing academic-research and fomc-research agents, you need to:
+To integrate with the existing academic-research, fomc-research, and political-news agents, you need to:
 
 1. **Update the import paths** in `routing_agent/agent.py`:
    ```python
    # Uncomment and adjust these imports based on your project structure
    from academic_research.academic_research.agent import academic_coordinator
    from fomc_research.fomc_research.agent import root_agent as fomc_agent
+   from political_news.political_news.agent import political_news_coordinator
    ```
 
 2. **Add the agents to the tools list**:
@@ -83,6 +88,7 @@ To integrate with the existing academic-research and fomc-research agents, you n
    tools=[
        AgentTool(agent=academic_coordinator),
        AgentTool(agent=fomc_agent),
+       AgentTool(agent=political_news_coordinator),
    ],
    ```
 
@@ -101,8 +107,11 @@ your-project/
 ├── academic-research/
 │   └── academic_research/
 │       └── agent.py
-└── fomc-research/
-    └── fomc_research/
+├── fomc-research/
+│   └── fomc_research/
+│       └── agent.py
+└── political-news/
+    └── political_news/
         └── agent.py
 ```
 
@@ -142,6 +151,15 @@ Routing Agent: I'll route this to the FOMC Research Agent since you're asking ab
 [Routes to FOMC Research Agent]
 ```
 
+### Political News Request
+```
+User: "What's the latest news on the Israel-Palestine conflict?"
+
+Routing Agent: I'll route this to the Political News Agent since you're asking about current political news and events. This agent specializes in gathering and analyzing political news from multiple sources, providing unbiased coverage of current political developments.
+
+[Routes to Political News Agent]
+```
+
 ### Ambiguous Request
 ```
 User: "I want to analyze economic policy"
@@ -149,6 +167,7 @@ User: "I want to analyze economic policy"
 Routing Agent: I need to clarify what type of economic policy analysis you're looking for. Are you:
 1. Analyzing academic research papers about economic policy (Academic Research Agent)
 2. Analyzing current Federal Reserve policy decisions and their market impact (FOMC Research Agent)
+3. Looking for current news about economic policy changes (Political News Agent)
 
 Please provide more context so I can route you to the most appropriate agent.
 ```
@@ -158,7 +177,7 @@ Please provide more context so I can route you to the most appropriate agent.
 The routing agent uses the following logic:
 
 1. **Keyword Analysis**: Identifies domain-specific keywords in the user's request
-2. **Intent Classification**: Determines whether the request is primarily academic or financial
+2. **Intent Classification**: Determines whether the request is primarily academic, financial, or political
 3. **Context Assessment**: Considers the broader context and user's likely goals
 4. **Clarification**: Asks for clarification when the intent is ambiguous
 

@@ -30,17 +30,21 @@ current_dir = Path(__file__).parent
 backend_dir = current_dir.parent.parent
 academic_research_path = backend_dir / "academic-research"
 fomc_research_path = backend_dir / "fomc-research"
+political_news_path = backend_dir / "political-news"
 
 # Add paths to sys.path for imports
 if academic_research_path.exists():
     sys.path.insert(0, str(academic_research_path))
 if fomc_research_path.exists():
     sys.path.insert(0, str(fomc_research_path))
+if political_news_path.exists():
+    sys.path.insert(0, str(political_news_path))
 
 # Import the specialized agents with error handling
 AGENTS_AVAILABLE = False
 academic_coordinator = None
 fomc_agent = None
+political_news_coordinator = None
 
 try:
     from academic_research import academic_coordinator
@@ -58,16 +62,28 @@ except ImportError as e:
     print("   This may be due to missing dependencies or authentication issues")
     print("   The FOMC agent requires Google Cloud authentication to be set up")
 
-# Check if both agents are available
-if academic_coordinator is not None and fomc_agent is not None:
+try:
+    from political_news import political_news_coordinator
+    print("✅ Successfully imported Political News Agent")
+except ImportError as e:
+    print(f"⚠️  Warning: Could not import Political News Agent: {e}")
+    print("   This may be due to missing dependencies or API key issues")
+
+# Check if agents are available
+available_agents = []
+if academic_coordinator is not None:
+    available_agents.append("Academic Research")
+if fomc_agent is not None:
+    available_agents.append("FOMC Research")
+if political_news_coordinator is not None:
+    available_agents.append("Political News")
+
+if len(available_agents) >= 2:
     AGENTS_AVAILABLE = True
-    print("✅ Both specialized agents are available for routing")
-elif academic_coordinator is not None:
-    print("✅ Academic Research Agent is available for routing")
-    print("⚠️  FOMC Research Agent is not available")
-elif fomc_agent is not None:
-    print("✅ FOMC Research Agent is available for routing")
-    print("⚠️  Academic Research Agent is not available")
+    print(f"✅ Multiple specialized agents are available for routing: {', '.join(available_agents)}")
+elif len(available_agents) == 1:
+    print(f"✅ {available_agents[0]} Agent is available for routing")
+    print("⚠️  Other agents are not available")
 else:
     print("⚠️  No specialized agents are available")
     print("   The routing agent will still work but with limited functionality")
@@ -78,13 +94,15 @@ if academic_coordinator is not None:
     tools.append(AgentTool(agent=academic_coordinator))
 if fomc_agent is not None:
     tools.append(AgentTool(agent=fomc_agent))
+if political_news_coordinator is not None:
+    tools.append(AgentTool(agent=political_news_coordinator))
 
 routing_agent = LlmAgent(
     name="routing_agent",
     model=MODEL,
     description=(
         "A routing agent that analyzes user requests and directs them to the appropriate "
-        "specialized agent - either academic research or FOMC financial analysis."
+        "specialized agent - academic research, FOMC financial analysis, or political news."
     ),
     instruction=prompt.ROUTING_AGENT_PROMPT,
     output_key="routed_response",
