@@ -27,9 +27,9 @@ MODEL = "gemini-2.5-pro"
 
 # Add parent directories to path to import the specialized agents
 current_dir = Path(__file__).parent
-project_root = current_dir.parent.parent
-academic_research_path = project_root / "academic-research"
-fomc_research_path = project_root / "fomc-research"
+backend_dir = current_dir.parent.parent
+academic_research_path = backend_dir / "academic-research"
+fomc_research_path = backend_dir / "fomc-research"
 
 # Add paths to sys.path for imports
 if academic_research_path.exists():
@@ -37,15 +37,47 @@ if academic_research_path.exists():
 if fomc_research_path.exists():
     sys.path.insert(0, str(fomc_research_path))
 
-# Import the specialized agents
+# Import the specialized agents with error handling
+AGENTS_AVAILABLE = False
+academic_coordinator = None
+fomc_agent = None
+
 try:
-    from academic_research.academic_research.agent import academic_coordinator
-    from fomc_research.fomc_research.agent import root_agent as fomc_agent
-    AGENTS_AVAILABLE = True
+    from academic_research import academic_coordinator
+    print("✅ Successfully imported Academic Research Agent")
 except ImportError as e:
-    print(f"Warning: Could not import specialized agents: {e}")
-    print("Please ensure academic-research and fomc-research agents are available")
-    AGENTS_AVAILABLE = False
+    print(f"⚠️  Warning: Could not import Academic Research Agent: {e}")
+    print("   This may be due to missing dependencies or authentication issues")
+
+try:
+    from fomc_research import root_agent as fomc_agent
+    print("✅ Successfully imported FOMC Research Agent")
+    print("   Note: BigQuery functionality may not be available without proper credentials")
+except ImportError as e:
+    print(f"⚠️  Warning: Could not import FOMC Research Agent: {e}")
+    print("   This may be due to missing dependencies or authentication issues")
+    print("   The FOMC agent requires Google Cloud authentication to be set up")
+
+# Check if both agents are available
+if academic_coordinator is not None and fomc_agent is not None:
+    AGENTS_AVAILABLE = True
+    print("✅ Both specialized agents are available for routing")
+elif academic_coordinator is not None:
+    print("✅ Academic Research Agent is available for routing")
+    print("⚠️  FOMC Research Agent is not available")
+elif fomc_agent is not None:
+    print("✅ FOMC Research Agent is available for routing")
+    print("⚠️  Academic Research Agent is not available")
+else:
+    print("⚠️  No specialized agents are available")
+    print("   The routing agent will still work but with limited functionality")
+
+# Create tools list with available agents
+tools = []
+if academic_coordinator is not None:
+    tools.append(AgentTool(agent=academic_coordinator))
+if fomc_agent is not None:
+    tools.append(AgentTool(agent=fomc_agent))
 
 routing_agent = LlmAgent(
     name="routing_agent",
@@ -56,10 +88,7 @@ routing_agent = LlmAgent(
     ),
     instruction=prompt.ROUTING_AGENT_PROMPT,
     output_key="routed_response",
-    tools=[
-        AgentTool(agent=academic_coordinator) if AGENTS_AVAILABLE else None,
-        AgentTool(agent=fomc_agent) if AGENTS_AVAILABLE else None,
-    ] if AGENTS_AVAILABLE else [],
+    tools=tools,
 )
 
 root_agent = routing_agent 
