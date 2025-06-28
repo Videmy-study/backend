@@ -1,0 +1,26 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "routing-agent"
+version = "0.1.0"
+description = "A routing agent that directs requests to appropriate specialized agents"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "routing_agent"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+google-adk = "^0.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-asyncio = "^0.21.0"
+
+[tool.poetry.scripts]
+routing-agent = "routing_agent.agent:root_agent"
+
+[tool.poetry.urls]
+"Homepage" = "https://github.com/yourusername/routing-agent"
+"Bug Tracker" = "https://github.com/yourusername/routing-agent/issues" 
