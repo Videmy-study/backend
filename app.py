@@ -7,7 +7,7 @@ from beanie import init_beanie, PydanticObjectId
 from database.schemas import Video, InstagramAccount, User, VideoStatus
 from managers.instagram_manager import InstagramManager
 from managers.vid_generator import generate, give_captions_and_tags
-from managers.chat_manager import chat_manager
+from managers.chat_manager_clean import chat_manager
 from api.schemas import (
     InstagramAccountCreate, InstagramAccountOut, AccountListResponse,
     VideoOut, VideoUpdate, VideoGenerationRequest, 
@@ -21,11 +21,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from pathlib import Path
+from datetime import datetime
+import logging
 
 load_dotenv()
 
 scheduler = AsyncIOScheduler()
 instagram_manager = InstagramManager()
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -59,39 +62,52 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:8080",
+        "http://localhost:4173",
+        "https://getreals.club",
+        "https://getrealsclub.vercel.app/",
+    ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.post("/chat", response_model=ChatResponse)
-async def chat_with_agents(request: ChatRequest):
+@app.post("/chat")
+async def chat_endpoint(request: ChatRequest):
     """
-    Chat with the AI routing agent that directs queries to specialized agents.
-    
-    This endpoint processes user messages and routes them to the appropriate
-    specialized agent (Academic Research, FOMC Research, or Political News)
-    based on the content and intent of the message.
+    Chat endpoint that routes messages to appropriate specialized agents.
     """
     try:
-        # Process the chat message through the chat manager
+        # Process the message using the chat manager
         result = await chat_manager.process_chat_message(
             message=request.message,
             user_id=request.user_id,
             session_id=request.session_id
         )
         
+        # Return the response
         return ChatResponse(
             success=result["success"],
             message=result["message"],
             response=result["response"],
             agent_used=result["agent_used"],
-            routing_reason=result["routing_reason"]
+            routing_reason=result["routing_reason"],
+            timestamp=result["timestamp"],
+            session_id=result.get("session_id"),
+            tool_calls=result.get("tool_calls", [])
         )
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Chat processing failed: {str(e)}")
+        logger.error(f"Error in chat endpoint: {e}")
+        return ChatResponse(
+            success=False,
+            message=f"Error processing chat request: {str(e)}",
+            response="I apologize, but I encountered an error processing your request.",
+            agent_used="error",
+            routing_reason="Error occurred",
+            timestamp=datetime.now().isoformat()
+        )
 
 @app.get("/chat/agents")
 async def get_available_agents():
