@@ -1,9 +1,13 @@
-import os
 import sys
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple
+from google.genai import types
+from typing import Dict, Any, Optional
+from google.adk.agents import LlmAgent
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
 from dotenv import load_dotenv
+import uuid
 
 # Load environment variables
 load_dotenv()
@@ -24,14 +28,14 @@ class ChatManager:
             # Try to import the routing agent if available
             current_dir = Path(__file__).parent.parent
             agents_dir = current_dir / "agents"
-            routing_agent_dir = agents_dir / "routing-agent"
+            routing_agent_dir = agents_dir / "routing_agent"
             
             if routing_agent_dir.exists():
                 # Add the routing agent directory to the path
                 sys.path.insert(0, str(routing_agent_dir))
                 
                 try:
-                    from routing_agent.routing_agent.agent import routing_agent, AGENTS_AVAILABLE
+                    import agents.routing_agent.routing_agent as routing_agent
                     self.routing_agent = routing_agent
                     logger.info("Routing agent initialized successfully")
                 except ImportError as e:
@@ -96,6 +100,43 @@ class ChatManager:
             Simulated response data
         """
         message_lower = message.lower()
+
+        if self.routing_agent is not None and hasattr(self.routing_agent, "root_agent"):
+            session_service = InMemorySessionService()
+            runner = Runner(
+                agent=self.routing_agent.root_agent,
+                app_name="routing_app",
+                session_service=session_service,
+            )
+            content = types.Content(role='user', parts=[types.Part(text=message)])
+
+            current_user_id = str(uuid.uuid4())
+            current_session_id = str(uuid.uuid4())
+            await session_service.create_session(
+                app_name="routing_app",
+                user_id=current_user_id,
+                session_id=current_session_id
+            )
+
+            async for event in runner.run_async(user_id=current_user_id, session_id=current_session_id, new_message=content):
+                # You can uncomment the line below to see *all* events during execution,
+                # including internal thoughts, tool calls, and tool responses.
+                print(f" [Event] Author: {event.author}, Type: {type(event).__name__}, Final: {event.is_final_response()}")
+                if event.content and event.content.parts:
+                    # Print text parts of the event for readability
+                    for part in event.content.parts:
+                        if part.text:
+                            print(f"  [Event Content] {part.text[:100]}...") # Print first 100 chars
+
+                # Key Concept: is_final_response() marks the concluding message for the turn.
+                if event.is_final_response():
+                    if event.content and event.content.parts:
+                        final_response_text = event.content.parts[0].text
+                    break # Stop processing events once the final response is found.
+
+            return {"response": final_response_text, "agent_used": "routing_agent", "routing_reason": "Simulated routing"}
+        else:
+            runner = None  # Or handle accordingly if runner is required
         
         # Simple keyword-based routing simulation
         if any(keyword in message_lower for keyword in ["research", "paper", "academic", "study", "literature", "citation"]):
