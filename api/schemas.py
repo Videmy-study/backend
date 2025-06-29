@@ -2,7 +2,6 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 from database.schemas import VideoStatus
 from datetime import datetime
-from enum import Enum
 
 # Response schemas for API responses
 class SuccessResponse(BaseModel):
@@ -14,6 +13,20 @@ class ErrorResponse(BaseModel):
     success: bool = False
     error: str
     details: Optional[str] = None
+
+# Chat schemas
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000, description="User's message/query")
+    user_id: Optional[str] = Field(None, description="Optional user ID for session tracking")
+    session_id: Optional[str] = Field(None, description="Optional session ID for conversation continuity")
+
+class ChatResponse(BaseModel):
+    success: bool
+    message: str
+    response: str = Field(..., description="AI agent's response")
+    agent_used: Optional[str] = Field(None, description="Which specialized agent was used")
+    routing_reason: Optional[str] = Field(None, description="Why this agent was chosen")
+    timestamp: datetime = Field(default_factory=datetime.now)
 
 # Video schemas
 class VideoBase(BaseModel):
@@ -121,7 +134,7 @@ class VideoGenerationResponse(BaseModel):
 class VideoUploadRequest(BaseModel):
     id: str
     username: str
-    video_path: str
+    video_path: Optional[str] = None
     caption: Optional[str] = ""
 
 class VideoUploadResponse(BaseModel):
