@@ -1,3 +1,4 @@
+import pathlib
 from beanie import Document, Link, Indexed
 from pydantic import Field, EmailStr
 from typing import List, Optional
@@ -5,7 +6,7 @@ from datetime import datetime
 from bson import ObjectId
 from enum import Enum
 
-class VideoaStatus(Enum):
+class VideoStatus(Enum):
     DRAFT = "draft"
     SCHEDULED = "scheduled"
     POSTED = "posted"
@@ -17,7 +18,7 @@ class Video(Document):
     video_url: str = Field(..., min_length=1, description="URL of the video")
     hashtags: List[str] = Field(default=[], description="List of hashtags for the video")
     caption: Optional[str] = Field(None, max_length=2200, description="Caption for the video")
-    status: Optional[VideoaStatus] = Field(None, description="Status of the video (e.g., 'draft', 'scheduled', 'posted')")
+    status: Optional[VideoStatus] = Field(None, description="Status of the video (e.g., 'draft', 'scheduled', 'posted')")
     insta_acc_id: Link["InstagramAccount"] = Field(..., description="Reference to the Instagram account")
     user_id: Link["User"] = Field(..., description="Reference to the user")
 
@@ -77,3 +78,9 @@ class User(Document):
         json_encoders = {
             ObjectId: str,
         }
+
+# Get the directory of the current file (i.e., backend/database)
+_current_dir = pathlib.Path(__file__).parent
+# Get the backend directory, then create a 'storage' directory inside it
+_storage_dir = _current_dir.parent / "storage"
+_storage_dir.mkdir(exist_ok=True)
