@@ -122,7 +122,7 @@ async def generate(prompt: str, user_id: str, insta_acc_id: str) -> Optional[Vid
                 # Check if the request was successful
                 if response.status_code == 200 and insta_acc and user:
                     # Open a file in binary write mode and save the video
-                    with open(f"../storage/video_{uuid_str}.mp4", "wb") as f:
+                    with open(f"storage/video_{uuid_str}.mp4", "wb") as f:
                         for chunk in response.iter_content(chunk_size=8192):
                             if chunk:
                                 f.write(chunk)
