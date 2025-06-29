@@ -81,8 +81,8 @@ def test_agent_connection():
         
     except ImportError as e:
         print(f"❌ Import error: {e}")
-        print("\n💡 Make sure you're running this from the routing-agent directory")
-        print("   cd backend/routing-agent")
+        print("\n💡 Make sure you're running this from the routing_agent directory")
+        print("   cd backend/routing_agent")
         print("   poetry shell")
         print("   python test_connection.py")
         return False

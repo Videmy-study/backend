@@ -9,7 +9,7 @@ agents/
 ├── academic-research/     # Academic research and paper analysis agent
 ├── fomc-research/         # FOMC meeting analysis and financial research agent
 ├── political-news/        # Political news scraping and analysis agent
-└── routing-agent/         # Main routing agent (to be moved here)
+└── routing_agent/         # Main routing agent (to be moved here)
 ```
 
 ## Agents Overview
@@ -46,7 +46,7 @@ All agents are designed to work from the unified backend environment. To use the
 
 2. Run the routing agent (recommended):
    ```powershell
-   cd agents/routing-agent
+   cd agents/routing_agent
    adk run routing_agent
    ```
 

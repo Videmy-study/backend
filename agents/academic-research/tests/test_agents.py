@@ -14,13 +14,23 @@
 
 """Test cases for the Academic Research."""
 
+import sys
+import os
+from pathlib import Path
 import textwrap
+import logging
 
 import dotenv
 import pytest
-from academic_research.agent import root_agent
 from google.adk.runners import InMemoryRunner
 from google.genai import types
+
+# Add the academic-research directory to the Python path
+current_dir = Path(__file__).parent
+academic_research_dir = current_dir.parent
+sys.path.insert(0, str(academic_research_dir))
+
+from academic_research.agent import academic_coordinator
 
 pytest_plugins = ("pytest_asyncio",)
 
@@ -43,7 +53,7 @@ async def test_happy_path():
 
     app_name = "academic-research"
 
-    runner = InMemoryRunner(agent=root_agent, app_name=app_name)
+    runner = InMemoryRunner(agent=academic_coordinator, app_name=app_name)
     session = await runner.session_service.create_session(
         app_name=runner.app_name, user_id="test_user"
     )
@@ -54,6 +64,7 @@ async def test_happy_path():
         session_id=session.id,
         new_message=content,
     ):
+        logging.debug(f"Yielded type: {type(event)}; Value: {event}")
         print(event)
         if event.content.parts and event.content.parts[0].text:
             response = event.content.parts[0].text

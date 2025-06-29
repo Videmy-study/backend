@@ -16,7 +16,7 @@ backend/
 │   ├── fomc_research/
 │   │   ├── agent.py           # root_agent (Agent)
 │   │   └── sub_agents/
-└── routing-agent/             # Routing Agent (connects the above)
+└── routing_agent/             # Routing Agent (connects the above)
     ├── routing_agent/
     │   ├── agent.py           # routing_agent (LlmAgent)
     │   ├── prompt.py          # Routing logic
@@ -32,7 +32,7 @@ backend/
 
 ```bash
 # Navigate to the routing agent directory
-cd backend/routing-agent
+cd backend/routing_agent
 
 # Run the setup script
 python setup_connected_agents.py --project-id YOUR_PROJECT_ID --location us-central1
@@ -135,7 +135,7 @@ Expected output:
 ==================================================
 📁 Current Directory Structure:
 ==============================
-Current directory: /path/to/backend/routing-agent
+Current directory: /path/to/backend/routing_agent
 Backend directory: /path/to/backend
 
 Academic Research: ✅ /path/to/backend/academic-research
@@ -181,7 +181,7 @@ FOMC Research: ✅ /path/to/backend/fomc-research
 If you get import errors:
 ```bash
 # Make sure you're in the right directory
-cd backend/routing-agent
+cd backend/routing_agent
 
 # Check if specialized agents exist
 ls ../academic-research/
@@ -245,7 +245,7 @@ Edit `routing_agent/prompt.py` to:
 
 ### **Local Development**
 ```bash
-cd backend/routing-agent
+cd backend/routing_agent
 poetry shell
 adk run routing_agent
 ```

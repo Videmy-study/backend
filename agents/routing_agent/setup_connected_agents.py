@@ -265,7 +265,7 @@ def main():
     print("✅ Setup completed successfully!")
     print("\n🎯 Next steps:")
     print("1. Run the routing agent locally:")
-    print("   cd backend/routing-agent")
+    print("   cd backend/routing_agent")
     print("   poetry shell")
     print("   adk run routing_agent")
     print("\n2. Or use the web interface:")

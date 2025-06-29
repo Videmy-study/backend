@@ -1,5 +1,5 @@
 [project]
-name = "routing-agent"
+name = "routing_agent"
 version = "0.1.0"
 description = "A routing agent that directs requests to appropriate specialized agents"
 authors = [
