@@ -16,6 +16,7 @@ class Video(Document):
     generation_prompt: str = Field(..., min_length=1, max_length=1000, description="Prompt used to generate the video")
     scheduled_time: Optional[datetime] = Field(None, description="Scheduled time for posting the video")
     video_url: str = Field(..., min_length=1, description="URL of the video")
+    video_path: str = Field(Indexed(unique=True), min_length=1, description="Path of the video")
     hashtags: List[str] = Field(default=[], description="List of hashtags for the video")
     caption: Optional[str] = Field(None, max_length=2200, description="Caption for the video")
     status: Optional[VideoStatus] = Field(None, description="Status of the video (e.g., 'draft', 'scheduled', 'posted')")

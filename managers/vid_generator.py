@@ -1,5 +1,6 @@
 import os
 import time
+from typing import Optional
 import uuid
 import requests
 from dotenv import load_dotenv
@@ -62,7 +63,7 @@ Fill in the following fields and return ONLY valid JSON (no extra text):
 
     return result
 
-async def generate(prompt: str, user_id: str, insta_acc_id: str):
+async def generate(prompt: str, user_id: str, insta_acc_id: str) -> Optional[Video]:
     # Fetch the actual documents to create proper Link objects
     user = await User.get(user_id)
     insta_acc = await InstagramAccount.get(insta_acc_id)
@@ -121,14 +122,15 @@ async def generate(prompt: str, user_id: str, insta_acc_id: str):
                 # Check if the request was successful
                 if response.status_code == 200 and insta_acc and user:
                     # Open a file in binary write mode and save the video
-                    with open(f"video_{uuid_str}.mp4", "wb") as f:
+                    with open(f"../storage/video_{uuid_str}.mp4", "wb") as f:
                         for chunk in response.iter_content(chunk_size=8192):
                             if chunk:
                                 f.write(chunk)
                     video = Video(
                         generation_prompt=prompt,
                         scheduled_time=None,  # Set to None for now, can be updated later
-                        video_url=f"video_{uuid_str}.mp4",
+                        video_url=json_response["url"],
+                        video_path=f"storage/video_{uuid_str}.mp4",
                         hashtags=captions_tags["hashtags"],
                         caption=captions_tags["caption"],
                         status=VideoStatus.DRAFT,
@@ -137,6 +139,7 @@ async def generate(prompt: str, user_id: str, insta_acc_id: str):
                     )
                     await video.save()
                     print(f"Video downloaded successfully as video.mp4")
+                    return video
                 else:
                     print(f"Failed to download video. Status code: {response.status_code}")
             else:
