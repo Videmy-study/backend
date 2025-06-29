@@ -28,22 +28,16 @@ MODEL = "gemini-2.5-pro"
 
 # Load environment variables from multiple locations
 def load_environment_variables():
-    """Load environment variables from routing agent and political news directories."""
+    """Load environment variables from the backend root .env file."""
     current_dir = Path(__file__).parent
-    backend_dir = current_dir.parent.parent
-    agents_dir = backend_dir / "agents"
+    backend_dir = current_dir.parent.parent.parent  # Go up: routing_agent -> routing-agent -> agents -> backend
+    backend_env_file = backend_dir / ".env"
     
-    # Load from routing agent directory
-    routing_env_file = backend_dir / "routing-agent" / ".env"
-    if routing_env_file.exists():
-        load_dotenv(routing_env_file)
-        print(f"✅ Loaded environment variables from {routing_env_file}")
-    
-    # Load from political news directory
-    political_env_file = agents_dir / "political-news" / ".env"
-    if political_env_file.exists():
-        load_dotenv(political_env_file)
-        print(f"✅ Loaded environment variables from {political_env_file}")
+    if backend_env_file.exists():
+        load_dotenv(backend_env_file)
+        print(f"✅ Loaded environment variables from {backend_env_file}")
+    else:
+        print(f"⚠️  No .env file found at {backend_env_file}")
     
     # Check for required political news API keys
     political_keys = ["NEWSAPI_KEY", "GNEWS_API_KEY", "MEDIASTACK_API_KEY", "NEWSDATA_API_KEY"]
