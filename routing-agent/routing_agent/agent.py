@@ -75,7 +75,7 @@ if political_news_path.exists():
 # Import the specialized agents with error handling
 AGENTS_AVAILABLE = False
 academic_coordinator = None
-fomc_agent = None
+fomc_research_agent = None
 political_news_coordinator = None
 
 try:
@@ -86,7 +86,7 @@ except ImportError as e:
     print("   This may be due to missing dependencies or authentication issues")
 
 try:
-    from fomc_research import root_agent as fomc_agent
+    from fomc_research import fomc_research_agent
     print("✅ Successfully imported FOMC Research Agent")
     print("   Note: BigQuery functionality may not be available without proper credentials")
 except ImportError as e:
@@ -105,7 +105,7 @@ except ImportError as e:
 available_agents = []
 if academic_coordinator is not None:
     available_agents.append("Academic Research")
-if fomc_agent is not None:
+if fomc_research_agent is not None:
     available_agents.append("FOMC Research")
 if political_news_coordinator is not None:
     available_agents.append("Political News")
@@ -124,8 +124,8 @@ else:
 tools = []
 if academic_coordinator is not None:
     tools.append(AgentTool(agent=academic_coordinator))
-if fomc_agent is not None:
-    tools.append(AgentTool(agent=fomc_agent))
+if fomc_research_agent is not None:
+    tools.append(AgentTool(agent=fomc_research_agent))
 if political_news_coordinator is not None:
     tools.append(AgentTool(agent=political_news_coordinator))
 

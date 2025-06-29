@@ -30,3 +30,9 @@ if not MODEL:
 
 # MODEL needs to be defined before this import
 from . import agent  # pylint: disable=wrong-import-position
+from .agent import fomc_research_agent
+
+# Export both names for backward compatibility
+root_agent = fomc_research_agent
+
+__all__ = ["root_agent", "fomc_research_agent"]

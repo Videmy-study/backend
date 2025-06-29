@@ -21,9 +21,10 @@ import os
 from collections.abc import Sequence
 
 from absl import app
-from google.cloud import bigquery
 
-bqclient = bigquery.Client()
+# Remove the BigQuery client creation at import time
+# bqclient = bigquery.Client()  # This was causing the ADC error
+
 logger = logging.getLogger(__name__)
 
 MOVE_SIZE_BP = 25
@@ -31,6 +32,17 @@ DATASET_NAME = os.getenv("GOOGLE_CLOUD_BQ_DATASET", "fomc_research_agent")
 TIMESERIES_CODES = os.getenv(
     "GOOGLE_GENAI_FOMC_AGENT_TIMESERIES_CODES",
     "SFRH5,SFRZ5")
+
+
+def get_bqclient():
+    """Get BigQuery client - only created when needed."""
+    try:
+        from google.cloud import bigquery
+        return bigquery.Client()
+    except Exception as e:
+        logger.warning(f"Failed to create BigQuery client: {e}")
+        logger.warning("BigQuery functionality will not be available")
+        return None
 
 
 def fetch_prices_from_bq(
@@ -48,6 +60,12 @@ def fetch_prices_from_bq(
 
     logger.debug("fetch_prices_from_bq: timeseries_codes: %s", timeseries_codes)
     logger.debug("fetch_prices_from_bq: dates: %s", dates)
+
+    # Get BigQuery client only when needed
+    bqclient = get_bqclient()
+    if bqclient is None:
+        logger.error("BigQuery client not available")
+        return {}
 
     query = f"""
 SELECT DISTINCT timeseries_code, date, value
@@ -141,6 +159,13 @@ def compute_probabilities(meeting_date_str: str) -> dict:
     prices = fetch_prices_from_bq(
         timeseries_codes, [meeting_date, meeting_date_day_before]
     )
+
+    # If BigQuery is not available, return an error
+    if not prices:
+        return {
+            "status": "ERROR", 
+            "message": "BigQuery not available. Please set up Google Cloud credentials or use Vertex AI with API key."
+        }
 
     error = None
     for code in timeseries_codes:

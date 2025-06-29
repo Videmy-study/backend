@@ -42,4 +42,4 @@ academic_coordinator = LlmAgent(
     ],
 )
 
-root_agent = academic_coordinator
+academic_research = academic_coordinator

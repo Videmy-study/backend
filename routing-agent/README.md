@@ -79,7 +79,7 @@ To integrate with the existing academic-research, fomc-research, and political-n
    ```python
    # Uncomment and adjust these imports based on your project structure
    from academic_research.academic_research.agent import academic_coordinator
-   from fomc_research.fomc_research.agent import root_agent as fomc_agent
+   from fomc_research.fomc_research.agent import fomc_research_agent
    from political_news.political_news.agent import political_news_coordinator
    ```
 
@@ -87,7 +87,7 @@ To integrate with the existing academic-research, fomc-research, and political-n
    ```python
    tools=[
        AgentTool(agent=academic_coordinator),
-       AgentTool(agent=fomc_agent),
+       AgentTool(agent=fomc_research_agent),
        AgentTool(agent=political_news_coordinator),
    ],
    ```

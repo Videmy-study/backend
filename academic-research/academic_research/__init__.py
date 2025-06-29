@@ -15,3 +15,6 @@
 """Academic_Research: Research advice, related literature finding, research area proposals, web knowledge access."""
 
 from . import agent
+from .agent import academic_coordinator, academic_research
+
+__all__ = ["academic_coordinator", "academic_research"]

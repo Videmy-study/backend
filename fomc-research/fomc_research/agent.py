@@ -32,9 +32,9 @@ logger = logging.getLogger(__name__)
 logger.debug("Using MODEL: %s", MODEL)
 
 
-root_agent = Agent(
+fomc_research_agent = Agent(
     model=MODEL,
-    name="root_agent",
+    name="fomc_research_agent",
     description=(
         "Use tools and other agents provided to generate an analysis report"
         "about the most recent FOMC meeting."
@@ -48,3 +48,6 @@ root_agent = Agent(
     ],
     before_model_callback=rate_limit_callback,
 )
+
+# Keep root_agent for backward compatibility
+root_agent = fomc_research_agent

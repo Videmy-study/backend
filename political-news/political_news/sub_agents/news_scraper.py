@@ -198,7 +198,7 @@ class NewsAPIClient:
             logger.error(f"Error fetching from MediaStack: {e}")
             return []
 
-def scrape_political_news(request: str, hours: int = None) -> Dict[str, Any]:
+def scrape_political_news(request: str, hours: Optional[int] = None) -> Dict[str, Any]:
     """Scrape political news from multiple APIs for a given request."""
     client = NewsAPIClient()
     
