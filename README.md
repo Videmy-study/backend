@@ -2,6 +2,80 @@
 
 This is the backend for the GDG Solution Hacks project, featuring a unified environment with multiple specialized AI agents.
 
+## 🏗️ Agent Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend Interface"
+        UI[Chat Interface]
+        VID[Video Feed]
+    end
+    
+    subgraph "Backend API"
+        API[FastAPI Server]
+        CHAT[/chat endpoint]
+    end
+    
+    subgraph "Routing Layer"
+        RA[Routing Agent]
+        RA --> AC[Academic Research]
+        RA --> FA[FOMC Research]
+        RA --> PA[Political News]
+    end
+    
+    subgraph "Academic Research Agent"
+        AC --> AW[academic_websearch]
+        AC --> AN[academic_newresearch]
+        AC --> AP[Paper Analysis]
+        AC --> AL[Literature Review]
+    end
+    
+    subgraph "FOMC Research Agent"
+        FA --> FR[research_agent]
+        FA --> FE[extract_page_data_agent]
+        FA --> FM[retrieve_meeting_data_agent]
+        FA --> FS[summarize_meeting_agent]
+        FA --> FA2[analysis_agent]
+        
+        subgraph "FOMC Tools"
+            FT1[compare_statements.py]
+            FT2[compute_rate_move_probability.py]
+            FT3[fetch_page.py]
+            FT4[fetch_transcript.py]
+            FT5[store_state.py]
+        end
+        
+        FA --> FT1
+        FA --> FT2
+        FA --> FT3
+        FA --> FT4
+        FA --> FT5
+    end
+    
+    subgraph "Political News Agent"
+        PA --> PS[news_scraper]
+        PA --> PB[bias_analyzer]
+        PA --> PN[News APIs]
+    end
+    
+    subgraph "External APIs"
+        PN --> NEWS[NewsAPI]
+        PN --> GNEWS[GNews]
+        PN --> MS[MediaStack]
+        PN --> ND[NewsData]
+    end
+    
+    UI --> API
+    VID --> API
+    API --> CHAT
+    CHAT --> RA
+    
+    style RA fill:#e1f5fe
+    style AC fill:#f3e5f5
+    style FA fill:#fff3e0
+    style PA fill:#e8f5e8
+```
+
 ## Project Structure
 
 ```
