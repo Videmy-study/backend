@@ -10,7 +10,7 @@ backend/
 │   ├── academic-research/  # Academic research agent
 │   ├── fomc-research/      # FOMC financial analysis agent
 │   ├── political-news/     # Political news agent
-│   └── routing-agent/      # Main routing agent
+│   └── routing_agent/      # Main routing agent
 ├── api/                    # API endpoints and schemas
 ├── database/               # Database models and schemas
 ├── managers/               # Business logic managers
@@ -31,7 +31,7 @@ backend/
 
 2. **Run the routing agent (recommended):**
    ```powershell
-   cd agents/routing-agent
+   cd agents/routing_agent
    adk run routing_agent
    ```
 
@@ -72,6 +72,6 @@ pip freeze > requirements.txt
 
 To run tests:
 ```powershell
-cd agents/routing-agent
+cd agents/routing_agent
 python test_connection.py
 ```

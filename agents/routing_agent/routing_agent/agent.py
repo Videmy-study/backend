@@ -30,7 +30,7 @@ MODEL = "gemini-2.5-pro"
 def load_environment_variables():
     """Load environment variables from the backend root .env file."""
     current_dir = Path(__file__).parent
-    backend_dir = current_dir.parent.parent.parent  # Go up: routing_agent -> routing-agent -> agents -> backend
+    backend_dir = current_dir.parent.parent.parent  # Go up: routing_agent -> routing_agent -> agents -> backend
     backend_env_file = backend_dir / ".env"
     
     if backend_env_file.exists():
@@ -54,7 +54,7 @@ load_environment_variables()
 
 # Add parent directories to path to import the specialized agents
 current_dir = Path(__file__).parent
-backend_dir = current_dir.parent.parent.parent  # Go up 3 levels: routing_agent -> routing-agent -> agents -> backend
+backend_dir = current_dir.parent.parent.parent  # Go up 3 levels: routing_agent -> routing_agent -> agents -> backend
 agents_dir = backend_dir / "agents"
 academic_research_path = agents_dir / "academic-research"
 fomc_research_path = agents_dir / "fomc-research"

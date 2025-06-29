@@ -48,7 +48,7 @@ The Routing Agent serves as an intelligent dispatcher that:
 
 1. **Clone and navigate to the project**:
    ```bash
-   cd routing-agent
+   cd routing_agent
    ```
 
 2. **Install dependencies**:
@@ -97,7 +97,7 @@ To integrate with the existing academic-research, fomc-research, and political-n
 Ensure your project structure looks like this:
 ```
 your-project/
-├── routing-agent/
+├── routing_agent/
 │   ├── routing_agent/
 │   │   ├── __init__.py
 │   │   ├── agent.py

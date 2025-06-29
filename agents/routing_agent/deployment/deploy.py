@@ -20,7 +20,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-def deploy_agent(project_id: str, location: str, agent_id: str = "routing-agent"):
+def deploy_agent(project_id: str, location: str, agent_id: str = "routing_agent"):
     """Deploy the routing agent to Google Agent Engine.
     
     Args:
@@ -81,8 +81,8 @@ def main():
     )
     parser.add_argument(
         "--agent-id",
-        default="routing-agent",
-        help="Agent ID for deployment (default: routing-agent)"
+        default="routing_agent",
+        help="Agent ID for deployment (default: routing_agent)"
     )
     
     args = parser.parse_args()
