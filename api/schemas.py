@@ -2,7 +2,6 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 from database.schemas import VideoStatus
 from datetime import datetime
-from enum import Enum
 
 # Response schemas for API responses
 class SuccessResponse(BaseModel):
@@ -135,7 +134,7 @@ class VideoGenerationResponse(BaseModel):
 class VideoUploadRequest(BaseModel):
     id: str
     username: str
-    video_path: str
+    video_path: Optional[str] = None
     caption: Optional[str] = ""
 
 class VideoUploadResponse(BaseModel):

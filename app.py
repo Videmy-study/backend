@@ -384,7 +384,7 @@ async def upload_video_to_instagram(request: VideoUploadRequest):
         
         media_id, message = await instagram_manager.upload_video(
             request.username, 
-            request.video_path, 
+            video.video_path, 
             video.caption if video.caption else ""
         )
         
