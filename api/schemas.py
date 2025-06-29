@@ -27,6 +27,8 @@ class ChatResponse(BaseModel):
     agent_used: Optional[str] = Field(None, description="Which specialized agent was used")
     routing_reason: Optional[str] = Field(None, description="Why this agent was chosen")
     timestamp: datetime = Field(default_factory=datetime.now)
+    session_id: Optional[str] = Field(None, description="Session ID for conversation continuity")
+    tool_calls: Optional[List[str]] = Field(None, description="List of tool calls made during processing")
 
 # Video schemas
 class VideoBase(BaseModel):
