@@ -15,6 +15,20 @@ class ErrorResponse(BaseModel):
     error: str
     details: Optional[str] = None
 
+# Chat schemas
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000, description="User's message/query")
+    user_id: Optional[str] = Field(None, description="Optional user ID for session tracking")
+    session_id: Optional[str] = Field(None, description="Optional session ID for conversation continuity")
+
+class ChatResponse(BaseModel):
+    success: bool
+    message: str
+    response: str = Field(..., description="AI agent's response")
+    agent_used: Optional[str] = Field(None, description="Which specialized agent was used")
+    routing_reason: Optional[str] = Field(None, description="Why this agent was chosen")
+    timestamp: datetime = Field(default_factory=datetime.now)
+
 # Video schemas
 class VideoBase(BaseModel):
     generation_prompt: str = Field(..., min_length=1, max_length=1000)
