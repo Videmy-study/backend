@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: videmy-study-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 start_server.py
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false  # Set this in Render dashboard
+      - key: GOOGLE_API_KEY
+        sync: false  # Set this in Render dashboard
+      - key: NEWS_API_KEY
+        sync: false  # Set this in Render dashboard
+      - key: GUARDIAN_API_KEY
+        sync: false  # Set this in Render dashboard
+      - key: NYT_API_KEY
+        sync: false  # Set this in Render dashboard
+    healthCheckPath: /chat/health
+    autoDeploy: true 
