@@ -9,7 +9,7 @@ from google.genai import types
 from beanie import Link
 from database.schemas import Video, VideoStatus, InstagramAccount, User
 
-load_dotenv("../.env")
+load_dotenv()
 
 client = genai.Client(
     api_key=os.getenv("GOOGLE_API_KEY"),
@@ -21,13 +21,13 @@ text_config = types.GenerateContentConfig(
 
 import json
 
-async def give_captions_and_tags(original_prompt: str):
+async def give_captions_and_tags(context: str):
     model = "gemini-2.0-flash"
     prompt = f"""
 You are an expert social media video creator.
 
-Given the following main video idea prompt:
-"{original_prompt}"
+Given the following context:
+"{context}"
 
 Fill in the following fields and return ONLY valid JSON (no extra text):
 
