@@ -7,12 +7,13 @@ from beanie import init_beanie, PydanticObjectId
 from database.schemas import Video, InstagramAccount, User, VideoStatus
 from managers.instagram_manager import InstagramManager
 from managers.vid_generator import generate, give_captions_and_tags
+from managers.chat_manager import chat_manager
 from api.schemas import (
     InstagramAccountCreate, InstagramAccountOut, AccountListResponse,
     VideoOut, VideoUpdate, VideoGenerationRequest, 
     VideoGenerationResponse, VideoUploadRequest, VideoUploadResponse,
     CaptionTagsRequest, CaptionTagsResponse, 
-    AccountStatsResponse, SuccessResponse,
+    AccountStatsResponse, SuccessResponse, ChatRequest, ChatResponse,
 )
 from motor.motor_asyncio import AsyncIOMotorClient
 from contextlib import asynccontextmanager
@@ -50,8 +51,8 @@ async def lifespan(app: FastAPI):
 
 # Create FastAPI instance
 app = FastAPI(
-    title="GDG Solution Hacks API",
-    description="API for Instagram video generation and management",
+    title="Videmy Study API",
+    description="API for AI-powered research platform with specialized agents",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -63,6 +64,75 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+@app.post("/chat", response_model=ChatResponse)
+async def chat_with_agents(request: ChatRequest):
+    """
+    Chat with the AI routing agent that directs queries to specialized agents.
+    
+    This endpoint processes user messages and routes them to the appropriate
+    specialized agent (Academic Research, FOMC Research, or Political News)
+    based on the content and intent of the message.
+    """
+    try:
+        # Process the chat message through the chat manager
+        result = await chat_manager.process_chat_message(
+            message=request.message,
+            user_id=request.user_id,
+            session_id=request.session_id
+        )
+        
+        return ChatResponse(
+            success=result["success"],
+            message=result["message"],
+            response=result["response"],
+            agent_used=result["agent_used"],
+            routing_reason=result["routing_reason"]
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chat processing failed: {str(e)}")
+
+@app.get("/chat/agents")
+async def get_available_agents():
+    """
+    Get list of available specialized agents.
+    
+    Returns information about which AI agents are currently available
+    for routing user queries.
+    """
+    try:
+        agents = chat_manager.get_available_agents()
+        return {
+            "success": True,
+            "available_agents": agents,
+            "total_agents": len(agents),
+            "service_status": "available" if chat_manager.is_available() else "unavailable"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get agent information: {str(e)}")
+
+@app.get("/chat/health")
+async def chat_health_check():
+    """
+    Health check for the chat service.
+    
+    Returns the status of the chat manager and routing agent.
+    """
+    try:
+        return {
+            "success": True,
+            "chat_service": "available" if chat_manager.is_available() else "unavailable",
+            "available_agents": len(chat_manager.get_available_agents()),
+            "status": "healthy" if chat_manager.is_available() else "unhealthy"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "chat_service": "error",
+            "error": str(e),
+            "status": "unhealthy"
+        }
 
 @app.post("/instagram-accounts/", response_model=InstagramAccountOut)
 async def create_instagram_account(account: InstagramAccountCreate):
@@ -314,7 +384,7 @@ async def upload_video_to_instagram(request: VideoUploadRequest):
         
         media_id, message = await instagram_manager.upload_video(
             request.username, 
-            request.video_path, 
+            video.video_path, 
             video.caption if video.caption else ""
         )
         
