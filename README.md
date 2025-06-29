@@ -13,7 +13,7 @@ graph TB
     
     subgraph "Backend API"
         API[FastAPI Server]
-        CHAT[/chat endpoint]
+        CHAT[ chat endpoint]
     end
     
     subgraph "Routing Layer"
